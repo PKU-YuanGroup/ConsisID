@@ -24,7 +24,7 @@ body {
 }
 
 .hero {
-  margin-top: 50px;   /* 设置顶部间距，增加与上一个 section 的距离 */
+  margin-top: 20px;   /* 设置顶部间距，增加与上一个 section 的距离 */
   margin-bottom: 50px; /* 设置底部间距，增加与下一个 section 的距离 */
 }
 
@@ -181,69 +181,62 @@ body {
 
 .images-row {
   display: flex;
-  justify-content: space-between; /* 在容器中均匀分布图片 */
-  width: 50%;                     /* 设置图片容器占屏幕宽度的一半 */
-  margin: 0 auto 20px auto;       /* 水平居中容器，并在底部添加间距 */
-  gap: 10px;                      /* 图片之间的间距 */
+  justify-content: space-between;
+  width: 50%;                     
+  margin: 0 auto 20px auto;       
+  gap: 10px;                      
 }
 
-/* 单个图片容器 */
 .image-item {
-  flex: 1;                        /* 每个图片容器均分可用空间 */
+  flex: 1;                        
 }
 
-/* 图片元素 */
 .image-item img {
-  width: 100%;                    /* 图片宽度充满其容器 */
-  height: auto;                   /* 图片高度根据宽度比例调整 */
-  object-fit: cover;              /* 确保图片保持比例 */
-  border-radius: 8px;             /* 添加圆角使图片更美观（可选） */
+  width: 100%;                    
+  height: auto;               
+  object-fit: cover;             
+  border-radius: 8px;
 }
 
 .image-item:last-child {
   margin-right: 0;
 }
 
-/* 视频容器布局 */
 .videos-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;  /* 两列布局，每行两个视频 */
-  gap: 30px 20px;                  /* 第一值为行间距，第二值为列间距，增大上下间距 */
+  grid-template-columns: 1fr 1fr;
+  gap: 30px 20px;
   margin-bottom: 20px;
 }
 
-/* 单个视频容器 */
 .video-item {
   width: 100%;
   display: flex;
-  flex-direction: column;  /* 垂直布局，使视频和文本描述上下排列 */
+  flex-direction: column;
   align-items: center;
-  gap: 10px;               /* 视频和文本描述之间的间距 */
-  background-color: #f0f0f0; /* 给每个容器增加背景色，确保文本清晰可见 */
-  padding: 10px;           /* 给容器添加内边距，确保内容不靠边 */
+  gap: 10px;
+  background-color: #f0f0f0;
+  padding: 10px;
   box-sizing: border-box;
 }
 
-/* 视频元素 */
 .video-item video {
-  width: 100%;             /* 减小视频宽度，使视频和文本都有空间 */
-  max-height: 350px;      /* 限制视频的最大高度 */
-  object-fit: contain;    /* 保持视频的原始比例并适应容器 */
+  width: 100%;
+  max-height: 350px;
+  object-fit: contain;
 }
 
-/* 文本描述 */
 .video-item p {
   width: 100%;
   margin: 0;
   padding: 5px;
-  background-color: #f0f0f0; /* 背景色为白色，便于与背景区分 */
-  color: #000;            /* 文本颜色为黑色 */
+  background-color: #f0f0f0;
+  color: #000;
   font-size: 1rem;
   box-sizing: border-box;
-  text-align: center;     /* 文本居中对齐 */
+  text-align: center;
 }
 
-/* 点导航的样式 */
 .pagination-dots {
   display: flex;
   justify-content: center;
@@ -264,7 +257,6 @@ body {
   background-color: #000000;
 }
 
-/* 左右滑动箭头 */
 .carousel-nav {
   position: absolute;
   top: 50%;
@@ -274,7 +266,7 @@ body {
   border: none;
   padding: 10px;
   cursor: pointer;
-  z-index: 1;  /* 保证按钮不被其他元素覆盖 */
+  z-index: 1;
 }
 
 .carousel-nav.prev {
@@ -286,10 +278,6 @@ body {
 }
 
 
-
-
-
-/* 新布局模块的样式 */
 .new-layout-container {
   position: relative;
   overflow: hidden;
@@ -301,7 +289,7 @@ body {
   display: none;
   width: 100%;
   text-align: center;
-  background-color: #f0f0f0; /* 给每个容器增加背景色，确保文本清晰可见 */
+  background-color: #f0f0f0;
 }
 
 .new-layout-item.active {
@@ -318,7 +306,7 @@ body {
   border: none;
   padding: 10px;
   cursor: pointer;
-  z-index: 1;  /* 保证按钮不被其他元素覆盖 */
+  z-index: 1;
 }
 
 .new-layout-nav.prev {
@@ -338,7 +326,7 @@ body {
   border: none;
   padding: 10px;
   cursor: pointer;
-  z-index: 1;  /* 保证按钮不被其他元素覆盖 */
+  z-index: 1;
 }
 
 .layout-nav.prev {
@@ -349,150 +337,133 @@ body {
   right: 10px;
 }
 
-
-/* 容器样式，图片和文本水平对齐，整体缩小宽度并居中 */
 .top-content {
-  display: flex;                       /* 使用 flex 布局 */
-  justify-content: space-between;      /* 子元素在左右之间均匀分布，保证两边留有空隙 */
-  align-items: center;                 /* 垂直方向居中对齐 */
-  width: 70%;                          /* 调整宽度为 50%，使整体更紧凑 */
-  margin: 0 auto;                      /* 水平方向居中，确保左右对称 */
-  margin-bottom: 20px;                 /* 确保与下方视频部分有间距 */
-  padding: 0;                          /* 去除内边距 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 70%;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  padding: 0;
 }
 
-/* 图片部分的容器样式 */
 .image-container {
-  flex: 0 1 auto;                      /* 容器的大小由内容决定，不自动拉伸 */
-  display: flex;                       /* 使用 flex 使图片居中 */
-  justify-content: center;             /* 水平方向居中 */
-  align-items: center;                 /* 垂直方向居中 */
-  margin: 0;                           /* 去除外边距 */
-  padding: 0;                          /* 去除内边距 */
+  flex: 0 1 auto
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
-/* 文本描述部分的容器样式 */
 .description-container {
-  flex: 0 1 auto;                      /* 容器的大小由内容决定，不占用多余空间 */
-  display: flex;                       /* 使用 flex 使文本居中 */
-  justify-content: center;             /* 水平方向居中 */
-  align-items: center;                 /* 垂直方向居中 */
-  margin: 30px 0 0 55px;                   /* 图片与文本描述之间留出一定的空隙 */
-  padding: 0;                          /* 去除内边距 */
+  flex: 0 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 0 0 55px;
+  padding: 0;
   max-width: 700px;
 }
 
-/* 图片样式 */
 .overview-image {
-  max-width: 100%;                     /* 确保图片不会超出容器 */
+  max-width: 100%;
   height: auto;
-  border-radius: 8px;                  /* 图片圆角 */
-  margin: 30px 0 0 0;                         /* 去除图片的外边距 */
+  border-radius: 8px;
+  margin: 30px 0 0 0;
 }
 
-/* 文本描述样式 */
 .overview-description {
   color: #333;
   font-size: 1.1em;
-  text-align: left;                    /* 文本内容左对齐 */
-  margin: 0;                           /* 去除文本的外边距 */
-  padding: 0;                          /* 去除内边距 */
-  line-height: 1.2;                    /* 适当减小行高，减少上下空间 */
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
 }
 
 
-/* 整体的容器，用于包含两排视频 */
 .six-videos {
   display: flex;
-  flex-direction: column;  /* 垂直方向排列，形成两排 */
-  gap: 20px;               /* 两排之间的间距 */
-  margin-top: 20px;        /* 确保与上方内容有适当的间距 */
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
 }
 
-/* 每一排视频的样式 */
 .video-row {
   display: flex;
-  justify-content: space-between;  /* 水平排列三个视频，均匀分布 */
-  gap: 20px;                       /* 每个视频之间的间距 */
+  justify-content: space-between;
+  gap: 20px;
 }
 
-
-
-/* 单个视频项的样式 */
-
 .video-item {
-  flex: 1;                         /* 每个视频项均分容器宽度 */
+  flex: 1;
   display: flex;
-  flex-direction: column;          /* 视频和描述垂直排列 */
-  align-items: center;             /* 内容居中对齐 */
-  width: 100%;             /* 减小视频宽度，使视频和文本都有空间 */
-  height: 100%;      /* 限制视频的最大高度 */
-  object-fit: contain;    /* 保持视频的原始比例并适应容器 */
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .video-item video {
-  max-width: 100%;                 /* 确保视频不会超出容器宽度 */
+  max-width: 100%;
   height: auto;
-  border-radius: 8px;              /* 视频圆角 */
+  border-radius: 8px;
 }
-
 
 
 .bottom-text {
-  margin-top: 10px;                /* 视频与描述之间的间距 */
-  text-align: center;              /* 文本居中对齐 */
-  font-size: 1em;                  /* 描述的字体大小 */
-  color: #333;                     /* 描述的颜色 */
+  margin-top: 10px;
+  text-align: center;
+  font-size: 1em;
+  color: #333;
 }
 
-/* 单个正方形视频项的样式 */
-/* 针对正方形视频的样式 */
 .idAnimator-video {
-  width: auto;                          /* 自动调整宽度以适应容器 */
-  height: 100%;                         /* 高度填满容器 */
-  max-height: 100%;                     /* 确保视频不会超出容器的高度 */
-  max-width: 100%;                      /* 确保视频不会超出容器的宽度 */
-  object-fit: contain;                  /* 保持视频比例并适应容器，避免拉伸或裁剪 */
-  padding: 0 16.5%;                       /* 只在左右添加10%的填充 */
-  background-color: #333;            /* 背景颜色，增强对比 */
-  border-radius: 8px;                   /* 视频圆角 */
+  width: auto;
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  padding: 0 16.5%;
+  background-color: #333;
+  border-radius: 8px;
 }
 
-/* 针对正方形视频的样式 */
 .DreamVideo-video {
-  width: auto;                          /* 自动调整宽度以适应容器 */
-  height: 100%;                         /* 高度填满容器 */
-  max-height: 100%;                     /* 确保视频不会超出容器的高度 */
-  max-width: 100%;                      /* 确保视频不会超出容器的宽度 */
-  object-fit: contain;                  /* 保持视频比例并适应容器，避免拉伸或裁剪 */
-  padding: 0 16.5%;                       /* 只在左右添加10%的填充 */
-  background-color: #333;            /* 背景颜色，增强对比 */
-  border-radius: 8px;                   /* 视频圆角 */
+  width: auto;
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  padding: 0 16.5%;
+  background-color: #333;
+  border-radius: 8px;
 }
 
-/* 针对正方形视频的样式 */
 .Magicme-video {
-  width: auto;                          /* 自动调整宽度以适应容器 */
-  height: 100%;                         /* 高度填满容器 */
-  max-height: 100%;                     /* 确保视频不会超出容器的高度 */
-  max-width: 100%;                      /* 确保视频不会超出容器的宽度 */
-  object-fit: contain;                  /* 保持视频比例并适应容器，避免拉伸或裁剪 */
-  padding: 0 16.5%;                       /* 只在左右添加10%的填充 */
-  background-color: #333;            /* 背景颜色，增强对比 */
-  border-radius: 8px;                   /* 视频圆角 */
+  width: auto;
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  padding: 0 16.5%;
+  background-color: #333;
+  border-radius: 8px;
 }
 
-/* 针对正方形视频的样式 */
 .vidu-video {
-  width: auto;                          /* 自动调整宽度以适应容器 */
-  height: 100%;                         /* 高度填满容器 */
-  max-height: 100%;                     /* 确保视频不会超出容器的高度 */
-  max-width: 100%;                      /* 确保视频不会超出容器的宽度 */
-  object-fit: contain;                  /* 保持视频比例并适应容器，避免拉伸或裁剪 */
-  padding: 5.7% 0;                       /* 只在左右添加10%的填充 */
-  background-color: #333;            /* 背景颜色，增强对比 */
-  border-radius: 8px;                   /* 视频圆角 */
+  width: auto;
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  padding: 5.7% 0;
+  background-color: #333;
+  border-radius: 8px;
 }
+
 
 
 .new-pagination-dots {
