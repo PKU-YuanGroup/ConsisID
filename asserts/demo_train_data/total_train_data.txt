@@ -1,1 +1,0 @@
-asserts/demo_train_data/dataname/videos,asserts/demo_train_data/dataname/captions/dataname_captions.json,asserts/demo_train_data/dataname

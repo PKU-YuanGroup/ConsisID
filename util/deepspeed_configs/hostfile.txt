@@ -1,2 +1,0 @@
-node-user@100.64.24.6 slots=8
-node-user@100.64.24.3 slots=8

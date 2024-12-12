@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "consisid_eva_clip"
+version = "1.0.0"
+description = "Identity-Preserving Text-to-Video Generation by Frequency Decomposition"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+]
+dependencies = [
+    "regex>=2024.11.6", "timm>=1.0.9", "einops>=0.8.0", "numpy>=1.26.4", "ftfy>=6.3.1", 
+    "huggingface-hub>=0.26.1", "safetensors>=0.4.5",
+    "insightface>=0.7.3", "facexlib>=0.3.0", "pyfacer>=0.0.4"
+]
+
+[project.urls]
+"Homepage" = "https://pku-yuangroup.github.io/ConsisID"
+"Bug Tracker" = "https://github.com/PKU-YuanGroup/ConsisID/issues"
+
+[tool.setuptools.packages.find]
+exclude = ["assets*", "benchmark*", "docs", "dist*", "playground*", "scripts*", "tests*"]
+
+[tool.wheel]
+exclude = ["assets*", "benchmark*", "docs", "dist*", "playground*", "scripts*", "tests*"]

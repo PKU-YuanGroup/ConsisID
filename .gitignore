@@ -1,4 +1,7 @@
 # Byte-compiled / optimized / DLL files
+build*
+consisid_eva_clip.egg-info*
+dist*
 output*
 logs*
 taming*
