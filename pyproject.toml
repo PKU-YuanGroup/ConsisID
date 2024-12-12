@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "consisid_eva_clip"
-version = "1.0.0"
+version = "1.0.1"
 description = "Identity-Preserving Text-to-Video Generation by Frequency Decomposition"
 readme = "README.md"
 requires-python = ">=3.9"
