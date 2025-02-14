@@ -539,7 +539,7 @@ class RandomSampler(Sampler[int]):
                 xx = torch.randperm(n, generator=generator).tolist()
                 if self._pos_start >= n:
                     self._pos_start = 0
-                print("xx top 10", xx[:10], self._pos_start)
+                # print("xx top 10", xx[:10], self._pos_start)
                 for idx in range(self._pos_start, n):
                     yield xx[idx]
                     self._pos_start = (self._pos_start + 1) % n
