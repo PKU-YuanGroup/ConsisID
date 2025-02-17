@@ -454,8 +454,14 @@ def main(args):
 
     # Freeze all the components
     text_encoder.requires_grad_(False)
-    transformer.requires_grad_(False)
     vae.requires_grad_(False)
+    transformer.requires_grad_(False)
+
+    VAE_SCALING_FACTOR = vae.config.scaling_factor
+    VAE_SCALE_FACTOR_SPATIAL = 2 ** (len(vae.config.block_out_channels) - 1)
+    RoPE_BASE_HEIGHT = transformer.config.sample_height * VAE_SCALE_FACTOR_SPATIAL
+    RoPE_BASE_WIDTH = transformer.config.sample_width * VAE_SCALE_FACTOR_SPATIAL
+
     if args.is_train_face:
         face_clip_model.requires_grad_(False)
         face_helper_1.face_det.requires_grad_(False)
@@ -469,9 +475,10 @@ def main(args):
         )
 
     # Move everything to device
-    transformer.to(accelerator.device, dtype=weight_dtype)
     text_encoder.to(accelerator.device, dtype=weight_dtype)
     vae.to(accelerator.device, dtype=weight_dtype)
+    transformer.to(accelerator.device, dtype=weight_dtype)
+
     if args.is_train_face:
         face_clip_model.to(accelerator.device, dtype=weight_dtype)
         face_helper_1.face_det.to(accelerator.device)
@@ -836,7 +843,6 @@ def main(args):
         # Only show the progress bar once on each machine.
         disable=not accelerator.is_local_main_process,
     )
-    vae_scale_factor_spatial = 2 ** (len(vae.config.block_out_channels) - 1)
 
     # For DeepSpeed training
     model_config = transformer.module.config if hasattr(transformer, "module") else transformer.config
@@ -1026,7 +1032,7 @@ def main(args):
                         for idx, (video, face_img) in enumerate(zip(batch_instance_video, align_crop_face_imgs)):
                             if args.is_train_face:
                                 latent_dist, _ = encode_video(video, get_image_latent=False)  # input [F, C, H, W] -> [B, C, F, H, W]
-                                vae_scale_factor_spatial = (2 ** (len(vae.config.block_out_channels) - 1) if vae is not None else 8)
+                                vae_scale_factor_spatial = (VAE_SCALE_FACTOR_SPATIAL if vae is not None else 8)
                                 video_processor = VideoProcessor(vae_scale_factor=vae_scale_factor_spatial)
                                 tensor = face_img.cpu().detach()
                                 tensor = tensor.squeeze()
@@ -1047,15 +1053,15 @@ def main(args):
                                 else:
                                     latent_dist, _ = encode_video(video, get_image_latent=False)
 
-                            video_latents = latent_dist.sample() * vae.config.scaling_factor
+                            video_latents = latent_dist.sample() * VAE_SCALING_FACTOR
                             video_latents = video_latents.permute(0, 2, 1, 3, 4)  # [B, C, F, H, W] -> [B, F, C, H, W]
                             video_latents_list.append(video_latents)
 
                             if args.train_type == 'i2v':
-                                image_latents = image_latent_dist.sample() * vae.config.scaling_factor  # torch.Size([1, 16, 1, 60, 90])
+                                image_latents = image_latent_dist.sample() * VAE_SCALING_FACTOR  # torch.Size([1, 16, 1, 60, 90])
                                 image_latents = image_latents.permute(0, 2, 1, 3, 4)  # [B, C, 1, H, W] -> [B, 1, C, H, W]  torch.Size([1, 1, 16, 60, 90])
                                 if args.is_kps:
-                                    face_kps_latents = face_kps_latent_dist.sample() * vae.config.scaling_factor  # torch.Size([1, 16, 1, 60, 90])
+                                    face_kps_latents = face_kps_latent_dist.sample() * VAE_SCALING_FACTOR  # torch.Size([1, 16, 1, 60, 90])
                                     face_kps_latents = face_kps_latents.permute(0, 2, 1, 3, 4)  # [B, C, 1, H, W] -> [B, 1, C, H, W]  torch.Size([1, 1, 16, 60, 90])
                                     image_latents = torch.cat([image_latents, face_kps_latents], dim=1)
                                     padding_shape = (video_latents.shape[0], video_latents.shape[1] - 2, *video_latents.shape[2:])
@@ -1105,6 +1111,20 @@ def main(args):
                     timesteps = timesteps.long()
 
                     # Sample noise that will be added to the latents
+                    patch_size_t = model_config.patch_size_t if hasattr(model_config, "patch_size_t") else None
+                    if patch_size_t is not None:
+                        ncopy = video_latents.shape[1] % patch_size_t
+                        # Copy the first frame ncopy times to match patch_size_t
+                        first_frame = video_latents[:, :1, :, :, :]  # Get first frame [B, 1, C, H, W]
+                        video_latents = torch.cat([first_frame.repeat(1, ncopy, 1, 1, 1), video_latents], dim=1)
+                        assert video_latents.shape[1] % patch_size_t == 0
+                    
+                    # Padding image_latents to the same frame number as latent
+                    padding_shape = (video_latents.shape[0], video_latents.shape[1] - image_latents.shape[1], * video_latents.shape[2:])
+                    latent_padding = image_latents.new_zeros(padding_shape)
+                    image_latents = torch.cat([image_latents, latent_padding], dim=1)
+
+                    # Sample noise that will be added to the latents
                     noise = torch.randn_like(video_latents)
 
                     # Add noise to the model input according to the noise magnitude at each timestep
@@ -1114,17 +1134,23 @@ def main(args):
                         noisy_model_input = torch.cat([noisy_video_latents, image_latents], dim=2)
                     else:
                         noisy_model_input = noisy_video_latents
-
+                    model_config.patch_size_t if hasattr(model_config, "patch_size_t") else None,
+                    ofs_embed_dim = model_config.ofs_embed_dim if hasattr(model_config, "ofs_embed_dim") else None,
+                    ofs_emb = None if ofs_embed_dim is None else noisy_model_input.new_full((1,), fill_value=2.0)
+                
                     # Prepare rotary embeds
                     image_rotary_emb = (
                         prepare_rotary_positional_embeddings(
-                            height=args.height,
-                            width=args.width,
+                            height=height * VAE_SCALE_FACTOR_SPATIAL,
+                            width=width * VAE_SCALE_FACTOR_SPATIAL,
                             num_frames=num_frames,
-                            vae_scale_factor_spatial=vae_scale_factor_spatial,
+                            vae_scale_factor_spatial=VAE_SCALE_FACTOR_SPATIAL,
                             patch_size=model_config.patch_size,
+                            patch_size_t=model_config.patch_size_t if hasattr(model_config, "patch_size_t") else None,
                             attention_head_dim=model_config.attention_head_dim,
                             device=accelerator.device,
+                            base_height=RoPE_BASE_HEIGHT,
+                            base_width=RoPE_BASE_WIDTH,
                         )
                         if model_config.use_rotary_positional_embeddings
                         else None
@@ -1135,12 +1161,19 @@ def main(args):
                     else:
                         temp_dim = 16
                     batch_size = 1
-                    noisy_video_latents = torch.zeros(1, 13, 16, 60, 90).to(accelerator.device, dtype=weight_dtype)
-                    noisy_model_input = torch.zeros(1, 13, temp_dim, 60, 90).to(accelerator.device, dtype=weight_dtype)
+                    patch_size_t = model_config.patch_size_t if hasattr(model_config, "patch_size_t") else None
+                    if patch_size_t is not None:
+                        noisy_video_latents = torch.zeros(1, 14, temp_dim, 60, 90).to(accelerator.device, dtype=weight_dtype)
+                        noisy_model_input = torch.zeros(1, 14, temp_dim, 60, 90).to(accelerator.device, dtype=weight_dtype)
+                        image_rotary_emb     = (torch.zeros(9450, 64).to(accelerator.device, dtype=weight_dtype), torch.zeros(9450, 64).to(accelerator.device, dtype=weight_dtype))
+                    else:
+                        noisy_video_latents = torch.zeros(1, 13, temp_dim, 60, 90).to(accelerator.device, dtype=weight_dtype)
+                        noisy_model_input = torch.zeros(1, 13, temp_dim, 60, 90).to(accelerator.device, dtype=weight_dtype)
+                        image_rotary_emb     = (torch.zeros(17550, 64).to(accelerator.device, dtype=weight_dtype), torch.zeros(17550, 64).to(accelerator.device, dtype=weight_dtype))
                     prompt_embeds = torch.zeros(1, 226, 4096).to(accelerator.device, dtype=weight_dtype)
                     timesteps = torch.randint(0, scheduler.config.num_train_timesteps, (1,), device=video_latents.device)
                     timesteps = timesteps.long()
-                    image_rotary_emb     = (torch.zeros(17550, 64).to(accelerator.device, dtype=weight_dtype), torch.zeros(17550, 64).to(accelerator.device, dtype=weight_dtype))
+                    ofs_emb   = torch.tensor([2.]).to(accelerator.device, dtype=weight_dtype)
                     valid_id_conds       = torch.zeros(1, 1280).to(accelerator.device, dtype=weight_dtype)
                     valid_id_vit_hiddens = [torch.zeros([1, 577, 1024]).to(accelerator.device, dtype=weight_dtype)] * 5
 
@@ -1149,6 +1182,7 @@ def main(args):
                         hidden_states=noisy_model_input,
                         encoder_hidden_states=prompt_embeds,
                         timestep=timesteps,
+                        ofs=ofs_emb,
                         image_rotary_emb=image_rotary_emb,
                         return_dict=False,
                         id_cond=valid_id_conds if valid_id_conds is not None else None,

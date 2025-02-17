@@ -3,8 +3,8 @@ export WANDB_MODE="offline"
 # export WANDB_MODE="online"
 
 # For training from scratch
-# export MODEL_PATH="THUDM/CogVideoX-5b-I2V"
-# export CONFIG_PATH="THUDM/CogVideoX-5b-I2V"
+# export MODEL_PATH="THUDM/CogVideoX-5b-I2V"    # "THUDM/CogVideoX1.5-5b-I2V"
+# export CONFIG_PATH="THUDM/CogVideoX-5b-I2V"   # "THUDM/CogVideoX1.5-5b-I2V"
 # For finetuning ConsisID
 export MODEL_PATH="BestWishYsh/ConsisID-preview"
 export CONFIG_PATH="BestWishYsh/ConsisID-preview"

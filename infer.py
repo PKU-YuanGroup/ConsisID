@@ -69,8 +69,8 @@ def generate_video(
 
 
     # 2. Load Pipeline.
-    transformer = ConsisIDTransformer3DModel.from_pretrained(model_path, subfolder=subfolder)
-    pipe = ConsisIDPipeline.from_pretrained(model_path, torch_dtype=dtype)
+    transformer = ConsisIDTransformer3DModel.from_pretrained(model_path, subfolder=subfolder, torch_dtype=dtype)
+    pipe = ConsisIDPipeline.from_pretrained(model_path, transformer=transformer, torch_dtype=dtype)
 
     # If you're using with lora, add this code
     if lora_path:
@@ -82,8 +82,8 @@ def generate_video(
     transformer.to(device, dtype=dtype)
     pipe.to(device)
     # Save Memory. Turn on if you don't have multiple GPUs or enough GPU memory(such as H100) and it will cost more time in inference, it may also reduce the quality
-    pipe.enable_model_cpu_offload()
-    pipe.enable_sequential_cpu_offload()
+    # pipe.enable_model_cpu_offload()
+    # pipe.enable_sequential_cpu_offload()
     # pipe.vae.enable_slicing()
     # pipe.vae.enable_tiling()
 

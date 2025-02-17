@@ -25,6 +25,7 @@ from diffusers.configuration_utils import ConfigMixin, register_to_config
 from diffusers.loaders import PeftAdapterMixin
 from diffusers.models.attention import Attention, FeedForward
 from diffusers.models.attention_processor import AttentionProcessor, CogVideoXAttnProcessor2_0
+from diffusers.models.cache_utils import CacheMixin
 from diffusers.models.embeddings import CogVideoXPatchEmbed, TimestepEmbedding, Timesteps
 from diffusers.models.modeling_outputs import Transformer2DModelOutput
 from diffusers.models.modeling_utils import ModelMixin
@@ -318,8 +319,10 @@ class ConsisIDBlock(nn.Module):
         encoder_hidden_states: torch.Tensor,
         temb: torch.Tensor,
         image_rotary_emb: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
+        attention_kwargs: Optional[Dict[str, Any]] = None,
     ) -> torch.Tensor:
         text_seq_length = encoder_hidden_states.size(1)
+        attention_kwargs = attention_kwargs or {}
 
         # norm & modulate
         norm_hidden_states, norm_encoder_hidden_states, gate_msa, enc_gate_msa = self.norm1(
@@ -331,6 +334,7 @@ class ConsisIDBlock(nn.Module):
             hidden_states=norm_hidden_states,
             encoder_hidden_states=norm_encoder_hidden_states,
             image_rotary_emb=image_rotary_emb,
+            **attention_kwargs,
         )
 
         hidden_states = hidden_states + gate_msa * attn_hidden_states
@@ -351,7 +355,7 @@ class ConsisIDBlock(nn.Module):
         return hidden_states, encoder_hidden_states
 
 
-class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
+class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin, CacheMixin):
     """
     A Transformer model for video-like data in [ConsisID](https://github.com/PKU-YuanGroup/ConsisID).
 
@@ -368,6 +372,8 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
             Whether to flip the sin to cos in the time embedding.
         time_embed_dim (`int`, defaults to `512`):
             Output dimension of timestep embeddings.
+        ofs_embed_dim (`int`, defaults to `512`):
+            Output dimension of "ofs" embeddings used in CogVideoX-5b-I2V in version 1.5
         text_embed_dim (`int`, defaults to `4096`):
             Input dimension of text embeddings from the text encoder.
         num_layers (`int`, defaults to `30`):
@@ -460,7 +466,9 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
             how strongly the model focuses on high frequency face-related content.
     """
 
+    _skip_layerwise_casting_patterns = ["patch_embed", "norm"]
     _supports_gradient_checkpointing = True
+    _no_split_modules = ["ConsisIDBlock", "CogVideoXPatchEmbed"]
 
     @register_to_config
     def __init__(
@@ -472,6 +480,7 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
         flip_sin_to_cos: bool = True,
         freq_shift: int = 0,
         time_embed_dim: int = 512,
+        ofs_embed_dim: Optional[int] = None,
         text_embed_dim: int = 4096,
         num_layers: int = 30,
         dropout: float = 0.0,
@@ -480,6 +489,7 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
         sample_height: int = 60,
         sample_frames: int = 49,
         patch_size: int = 2,
+        patch_size_t: Optional[int] = None,
         temporal_compression_ratio: int = 4,
         max_text_seq_length: int = 226,
         activation_fn: str = "gelu-approximate",
@@ -490,6 +500,7 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
         temporal_interpolation_scale: float = 1.0,
         use_rotary_positional_embeddings: bool = False,
         use_learned_positional_embeddings: bool = False,
+        patch_bias: bool = True,
         is_train_face: bool = False,
         is_kps: bool = False,
         cross_attn_interval: int = 2,
@@ -520,10 +531,11 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
         # 1. Patch embedding
         self.patch_embed = CogVideoXPatchEmbed(
             patch_size=patch_size,
+            patch_size_t=patch_size_t,
             in_channels=in_channels,
             embed_dim=inner_dim,
             text_embed_dim=text_embed_dim,
-            bias=True,
+            bias=patch_bias,
             sample_width=sample_width,
             sample_height=sample_height,
             sample_frames=sample_frames,
@@ -536,9 +548,17 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
         )
         self.embedding_dropout = nn.Dropout(dropout)
 
-        # 2. Time embeddings
+        # 2. Time embeddings and ofs embedding(Only CogVideoX1.5-5B I2V have)
         self.time_proj = Timesteps(inner_dim, flip_sin_to_cos, freq_shift)
         self.time_embedding = TimestepEmbedding(inner_dim, time_embed_dim, timestep_activation_fn)
+
+        self.ofs_proj = None
+        self.ofs_embedding = None
+        if ofs_embed_dim:
+            self.ofs_proj = Timesteps(ofs_embed_dim, flip_sin_to_cos, freq_shift)
+            self.ofs_embedding = TimestepEmbedding(
+                ofs_embed_dim, ofs_embed_dim, timestep_activation_fn
+            )  # same as time embeddings, for ofs
 
         # 3. Define spatio-temporal transformers blocks
         self.transformer_blocks = nn.ModuleList(
@@ -567,7 +587,15 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
             norm_eps=norm_eps,
             chunk_dim=1,
         )
-        self.proj_out = nn.Linear(inner_dim, patch_size * patch_size * out_channels)
+
+        if patch_size_t is None:
+            # For Version 1.0
+            output_dim = patch_size * patch_size * out_channels
+        else:
+            # For Version 1.5
+            output_dim = patch_size * patch_size * patch_size_t * out_channels
+
+        self.proj_out = nn.Linear(inner_dim, output_dim)
 
         self.is_train_face = is_train_face
         self.is_kps = is_kps
@@ -698,12 +726,14 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
         for name, module in self.named_children():
             fn_recursive_attn_processor(name, module, processor)
 
+
     def forward(
         self,
         hidden_states: torch.Tensor,
         encoder_hidden_states: torch.Tensor,
         timestep: Union[int, float, torch.LongTensor],
         timestep_cond: Optional[torch.Tensor] = None,
+        ofs: Optional[Union[int, float, torch.LongTensor]] = None,
         image_rotary_emb: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
         attention_kwargs: Optional[Dict[str, Any]] = None,
         id_cond: Optional[torch.Tensor] = None,
@@ -748,6 +778,12 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
         t_emb = t_emb.to(dtype=hidden_states.dtype)
         emb = self.time_embedding(t_emb, timestep_cond)
 
+        if self.ofs_embedding is not None:
+            ofs_emb = self.ofs_proj(ofs)
+            ofs_emb = ofs_emb.to(dtype=hidden_states.dtype)
+            ofs_emb = self.ofs_embedding(ofs_emb)
+            emb = emb + ofs_emb
+
         # 2. Patch embedding
         # torch.Size([1, 226, 4096])   torch.Size([1, 13, 32, 60, 90])
         hidden_states = self.patch_embed(encoder_hidden_states, hidden_states)  # torch.Size([1, 17776, 3072])
@@ -767,6 +803,7 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
                     encoder_hidden_states,
                     emb,
                     image_rotary_emb,
+                    attention_kwargs,
                 )
             else:
                 hidden_states, encoder_hidden_states = block(
@@ -774,6 +811,7 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
                     encoder_hidden_states=encoder_hidden_states,
                     temb=emb,
                     image_rotary_emb=image_rotary_emb,
+                    attention_kwargs=attention_kwargs,
                 )
 
             if self.is_train_face:
@@ -783,20 +821,24 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
                     )  # torch.Size([2, 32, 2048])  torch.Size([2, 17550, 3072])
                     ca_idx += 1
 
-        hidden_states = torch.cat([encoder_hidden_states, hidden_states], dim=1)
         hidden_states = self.norm_final(hidden_states)
-        hidden_states = hidden_states[:, text_seq_length:]
 
         # 4. Final block
         hidden_states = self.norm_out(hidden_states, temb=emb)
         hidden_states = self.proj_out(hidden_states)
 
         # 5. Unpatchify
-        # Note: we use `-1` instead of `channels`:
-        #   - It is okay to `channels` use for ConsisID (number of input channels is equal to output channels)
         p = self.config.patch_size
-        output = hidden_states.reshape(batch_size, num_frames, height // p, width // p, -1, p, p)
-        output = output.permute(0, 1, 4, 2, 5, 3, 6).flatten(5, 6).flatten(3, 4)
+        p_t = self.config.patch_size_t
+
+        if p_t is None:
+            output = hidden_states.reshape(batch_size, num_frames, height // p, width // p, -1, p, p)
+            output = output.permute(0, 1, 4, 2, 5, 3, 6).flatten(5, 6).flatten(3, 4)
+        else:
+            output = hidden_states.reshape(
+                batch_size, (num_frames + p_t - 1) // p_t, height // p, width // p, -1, p_t, p, p
+            )
+            output = output.permute(0, 1, 5, 4, 2, 6, 3, 7).flatten(6, 7).flatten(4, 5).flatten(1, 2)
 
         if USE_PEFT_BACKEND:
             # remove `lora_scale` from each PEFT layer
@@ -886,8 +928,9 @@ class ConsisIDTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin):
         return model
 
 if __name__ == '__main__':
-    device = "cuda:0"
+    device = "cuda"
     weight_dtype = torch.bfloat16
+    # pretrained_model_name_or_path = "THUDM/CogVideoX1.5-5B-I2V"
     pretrained_model_name_or_path = "BestWishYsh/ConsisID-preview"
 
     transformer_additional_kwargs={
@@ -897,8 +940,8 @@ if __name__ == '__main__':
         'is_train_face': True,
         'is_kps': False,
         'LFE_num_tokens': 32,
-        'LFE_output_dim': 768,
-        'LFE_heads': 12,
+        'LFE_output_dim': 2048,
+        'LFE_num_heads': 16,
         'cross_attn_interval': 2,
     }
 
@@ -920,16 +963,30 @@ if __name__ == '__main__':
     target           = torch.ones(b, 13, dim, 60, 90).to(device, dtype=weight_dtype)
     latents          = torch.ones(b, 13, dim, 60, 90).to(device, dtype=weight_dtype)
     prompt_embeds    = torch.ones(b, 226, 4096).to(device, dtype=weight_dtype)
-    image_rotary_emb = (torch.ones(17550, 64).to(device, dtype=weight_dtype), torch.ones(17550, 64).to(device, dtype=weight_dtype))
+    if "1.5" in pretrained_model_name_or_path:
+        image_rotary_emb = (torch.ones(9450, 64).to(device, dtype=weight_dtype), torch.ones(9450, 64).to(device, dtype=weight_dtype))
+    else:
+        image_rotary_emb = (torch.ones(17550, 64).to(device, dtype=weight_dtype), torch.ones(17550, 64).to(device, dtype=weight_dtype))
     timesteps        = torch.tensor([311]).to(device, dtype=weight_dtype)
+    ofs_emb          = torch.tensor([2.]).to(device, dtype=weight_dtype) if "1.5" in pretrained_model_name_or_path else None
     id_vit_hidden    = [torch.ones([1, 577, 1024]).to(device, dtype=weight_dtype)] * 5
     id_cond          = torch.ones(b, 1280).to(device, dtype=weight_dtype)
     assert len(timesteps) == b
+
+    # Sample noise that will be added to the latents
+    patch_size_t = transformer.config.patch_size_t
+    if patch_size_t is not None:
+        ncopy = noisy_latents.shape[1] % patch_size_t
+        # Copy the first frame ncopy times to match patch_size_t
+        first_frame = noisy_latents[:, :1, :, :, :]  # Get first frame [B, 1, C, H, W]
+        noisy_latents = torch.cat([first_frame.repeat(1, ncopy, 1, 1, 1), noisy_latents], dim=1)
+        assert noisy_latents.shape[1] % patch_size_t == 0
 
     model_output = transformer(
                     hidden_states=noisy_latents,
                     encoder_hidden_states=prompt_embeds,
                     timestep=timesteps,
+                    ofs=ofs_emb,
                     image_rotary_emb=image_rotary_emb,
                     return_dict=False,
                     id_vit_hidden=id_vit_hidden if id_vit_hidden is not None else None,
