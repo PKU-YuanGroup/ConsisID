@@ -49,7 +49,7 @@ This repository is the official implementation of ConsisID, a tuning-free DiT-ba
 ## 📣 News
 
 * ⏳⏳⏳ Release the full code & datasets & weights.
-* `[2024.12.09]`  🔥 We have adapted the code for CogVideoX1.5, and you can use our code not only for training ConsisID but also for the CogVideoX-series.
+* `[2024.02.16]`  🔥 We have adapted the code for CogVideoX1.5, and you can use our code not only for training ConsisID but also for the CogVideoX-series.
 * `[2024.01.19]`  🤗 Thanks [@arrow](https://github.com/a-r-r-o-w), [@yiyixuxu](https://github.com/yiyixuxu), [@hlky](https://github.com/hlky) and [@stevhliu](https://github.com/stevhliu), ConsisID will be merged into [diffusers](https://huggingface.co/docs/diffusers/main/en/using-diffusers/consisid#identity-preserving-text-to-video) in `0.33.0`. So for now, please use `pip install git+https://github.com/huggingface/diffusers.git` to install diffusers dev version. And we have reorganized the code and weight configs, so it's better to update your local files if you have cloned them previously.
 * `[2024.12.26]`  🚀 We release the [cache inference code](https://github.com/PKU-YuanGroup/ConsisID/tree/main/tools/cache_inference) for ConsisID powered by [TeaCache](https://github.com/LiewFeng/TeaCache). Thanks [@LiewFeng](https://github.com/LiewFeng) for his help.
 * `[2024.12.24]`  🚀 We release the [parallel inference code](https://github.com/PKU-YuanGroup/ConsisID/tree/main/tools/parallel_inference) for ConsisID powered by [xDiT](https://github.com/xdit-project/xDiT). Thanks [@feifeibear](https://github.com/feifeibear) for his help.
