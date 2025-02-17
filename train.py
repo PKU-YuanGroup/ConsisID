@@ -1082,16 +1082,6 @@ def main(args):
                             image_latents = torch.cat(image_latents_list).to(memory_format=torch.contiguous_format).float()
                             image_latents = image_latents.to(dtype=weight_dtype)  # [B, F, C, H, W]
 
-                        # enable mask loss
-                        if args.is_train_face and args.enable_mask_loss and enable_mask_loss_flag:
-                            # way 1
-                            dense_masks = dense_masks.unsqueeze(1)  # B F H W -> B 1 F H W
-                            temp_video_latents = video_latents.clone().permute(0, 2, 1, 3, 4)  # B F C H W -> B C F H W
-                            dense_masks = resize_mask(dense_masks, temp_video_latents, process_first_frame_only=False)  # torch.Size([2, 1, 13, 60, 90]),  B C F H W
-                            dense_masks = dense_masks.repeat(1, temp_video_latents.shape[1], 1, 1, 1).permute(0, 2, 1, 3, 4).float()  # B C F H W -> B F C H W
-                            dense_masks = dense_masks.reshape(video_latents.shape[0], -1)
-                            dense_masks = dense_masks.to(accelerator.device)
-
                 if args.low_vram:
                     vae.to('cpu')
                     text_encoder.to('cpu')
@@ -1155,6 +1145,16 @@ def main(args):
                         if model_config.use_rotary_positional_embeddings
                         else None
                     )
+
+                    # enable mask loss
+                    if args.is_train_face and args.enable_mask_loss and enable_mask_loss_flag:
+                        # way 1
+                        dense_masks = dense_masks.unsqueeze(1)  # B F H W -> B 1 F H W
+                        temp_video_latents = video_latents.clone().permute(0, 2, 1, 3, 4)  # B F C H W -> B C F H W
+                        dense_masks = resize_mask(dense_masks, temp_video_latents, process_first_frame_only=False)  # torch.Size([2, 1, 13, 60, 90]),  B C F H W
+                        dense_masks = dense_masks.repeat(1, temp_video_latents.shape[1], 1, 1, 1).permute(0, 2, 1, 3, 4).float()  # B C F H W -> B F C H W
+                        dense_masks = dense_masks.reshape(video_latents.shape[0], -1)
+                        dense_masks = dense_masks.to(accelerator.device)
                 else:
                     if args.train_type == 'i2v':
                         temp_dim = 32
