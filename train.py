@@ -1109,10 +1109,10 @@ def main(args):
                         video_latents = torch.cat([first_frame.repeat(1, ncopy, 1, 1, 1), video_latents], dim=1)
                         assert video_latents.shape[1] % patch_size_t == 0
                     
-                    # Padding image_latents to the same frame number as latent
-                    padding_shape = (video_latents.shape[0], video_latents.shape[1] - image_latents.shape[1], * video_latents.shape[2:])
-                    latent_padding = image_latents.new_zeros(padding_shape)
-                    image_latents = torch.cat([image_latents, latent_padding], dim=1)
+                        # Padding image_latents to the same frame number as latent
+                        padding_shape = (video_latents.shape[0], video_latents.shape[1] - image_latents.shape[1], * video_latents.shape[2:])
+                        latent_padding = image_latents.new_zeros(padding_shape)
+                        image_latents = torch.cat([image_latents, latent_padding], dim=1)
 
                     # Sample noise that will be added to the latents
                     noise = torch.randn_like(video_latents)
@@ -1150,8 +1150,14 @@ def main(args):
                     if args.is_train_face and args.enable_mask_loss and enable_mask_loss_flag:
                         # way 1
                         dense_masks = dense_masks.unsqueeze(1)  # B F H W -> B 1 F H W
-                        temp_video_latents = video_latents.clone().permute(0, 2, 1, 3, 4)  # B F C H W -> B C F H W
+                        temp_video_latents = torch.zeros((batch_size, num_channels, num_frames, height, width))
                         dense_masks = resize_mask(dense_masks, temp_video_latents, process_first_frame_only=False)  # torch.Size([2, 1, 13, 60, 90]),  B C F H W
+                        if patch_size_t is not None:
+                            ncopy = dense_masks.shape[2] % patch_size_t
+                            # Copy the first frame ncopy times to match patch_size_t
+                            first_frame = dense_masks[:, :, :1, :, :]  # Get first frame [B, C, 1, H, W]
+                            dense_masks = torch.cat([first_frame.repeat(1, 1, ncopy, 1, 1), dense_masks], dim=2)
+                            assert dense_masks.shape[2] % patch_size_t == 0
                         dense_masks = dense_masks.repeat(1, temp_video_latents.shape[1], 1, 1, 1).permute(0, 2, 1, 3, 4).float()  # B C F H W -> B F C H W
                         dense_masks = dense_masks.reshape(video_latents.shape[0], -1)
                         dense_masks = dense_masks.to(accelerator.device)
@@ -1163,11 +1169,11 @@ def main(args):
                     batch_size = 1
                     patch_size_t = model_config.patch_size_t if hasattr(model_config, "patch_size_t") else None
                     if patch_size_t is not None:
-                        noisy_video_latents = torch.zeros(1, 14, temp_dim, 60, 90).to(accelerator.device, dtype=weight_dtype)
+                        noisy_video_latents = torch.zeros(1, 14, 16, 60, 90).to(accelerator.device, dtype=weight_dtype)
                         noisy_model_input = torch.zeros(1, 14, temp_dim, 60, 90).to(accelerator.device, dtype=weight_dtype)
                         image_rotary_emb     = (torch.zeros(9450, 64).to(accelerator.device, dtype=weight_dtype), torch.zeros(9450, 64).to(accelerator.device, dtype=weight_dtype))
                     else:
-                        noisy_video_latents = torch.zeros(1, 13, temp_dim, 60, 90).to(accelerator.device, dtype=weight_dtype)
+                        noisy_video_latents = torch.zeros(1, 13, 16, 60, 90).to(accelerator.device, dtype=weight_dtype)
                         noisy_model_input = torch.zeros(1, 13, temp_dim, 60, 90).to(accelerator.device, dtype=weight_dtype)
                         image_rotary_emb     = (torch.zeros(17550, 64).to(accelerator.device, dtype=weight_dtype), torch.zeros(17550, 64).to(accelerator.device, dtype=weight_dtype))
                     prompt_embeds = torch.zeros(1, 226, 4096).to(accelerator.device, dtype=weight_dtype)
