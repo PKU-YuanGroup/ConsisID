@@ -1,11 +1,7 @@
 import os
-
 import requests
 from huggingface_hub import hf_hub_download, snapshot_download
 from tqdm import tqdm
-
-
-model_path = "../../ckpts"
 
 
 def download_file(url, local_path):
@@ -28,20 +24,23 @@ def download_file(url, local_path):
                 f.write(chunk)
 
 
-if not os.path.exists(os.path.join(model_path, "data_process", "step1_yolov8_face.pt")):
-    hf_hub_download(repo_id="BestWishYsh/ConsisID-preview", filename="data_process/step1_yolov8_face.pt", local_dir=model_path)
+if __name__ == "__main__":
+    model_path = "../../ckpts"
 
-if not os.path.exists(os.path.join(model_path, "data_process", "step1_yolov8_head.pt")):
-    hf_hub_download(repo_id="BestWishYsh/ConsisID-preview", filename="data_process/step1_yolov8_head.pt", local_dir=model_path)
+    if not os.path.exists(os.path.join(model_path, "data_process", "step1_yolov8_face.pt")):
+        hf_hub_download(repo_id="BestWishYsh/ConsisID-preview", filename="data_process/step1_yolov8_face.pt", local_dir=model_path)
 
-if not os.path.exists(os.path.join(model_path, "data_process", "sam2.1_hiera_large.pt")):
-    hf_hub_download(repo_id="facebook/sam2.1-hiera-large", filename="sam2.1_hiera_large.pt", local_dir=os.path.join(model_path, "data_process"))
+    if not os.path.exists(os.path.join(model_path, "data_process", "step1_yolov8_head.pt")):
+        hf_hub_download(repo_id="BestWishYsh/ConsisID-preview", filename="data_process/step1_yolov8_head.pt", local_dir=model_path)
 
-if not os.path.exists(os.path.join(model_path, "data_process", "Qwen2-VL-7B-Instruct")):
-    snapshot_download(repo_id="Qwen/Qwen2-VL-7B-Instruct", local_dir=os.path.join(model_path, "data_process", "Qwen2-VL-7B-Instruct"))
+    if not os.path.exists(os.path.join(model_path, "data_process", "sam2.1_hiera_large.pt")):
+        hf_hub_download(repo_id="facebook/sam2.1-hiera-large", filename="sam2.1_hiera_large.pt", local_dir=os.path.join(model_path, "data_process"))
 
-if not os.path.exists(os.path.join(model_path, "data_process", "yolo11l.pt")):
-    download_file("https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l.pt", os.path.join(model_path, "data_process", "yolo11l.pt"))
+    if not os.path.exists(os.path.join(model_path, "data_process", "Qwen2-VL-7B-Instruct")):
+        snapshot_download(repo_id="Qwen/Qwen2-VL-7B-Instruct", local_dir=os.path.join(model_path, "data_process", "Qwen2-VL-7B-Instruct"))
 
-if not os.path.exists(os.path.join(model_path, "data_process", "yolo11l-pose.pt")):
-    download_file("https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l-pose.pt", os.path.join(model_path, "data_process", "yolo11l-pose.pt"))
+    if not os.path.exists(os.path.join(model_path, "data_process", "yolo11l.pt")):
+        download_file("https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l.pt", os.path.join(model_path, "data_process", "yolo11l.pt"))
+
+    if not os.path.exists(os.path.join(model_path, "data_process", "yolo11l-pose.pt")):
+        download_file("https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l-pose.pt", os.path.join(model_path, "data_process", "yolo11l-pose.pt"))
