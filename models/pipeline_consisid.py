@@ -290,6 +290,12 @@ class ConsisIDPipeline(DiffusionPipeline, CogVideoXLoraLoaderMixin):
 
         self.video_processor = VideoProcessor(vae_scale_factor=self.vae_scale_factor_spatial)
 
+        if not hasattr(self.transformer.config, "patch_size_t"):
+            self.transformer.config.patch_size_t = None
+
+        if not hasattr(self.transformer.config, "ofs_embed_dim"):
+            self.transformer.config.ofs_embed_dim = None
+
     # Copied from diffusers.pipelines.cogvideo.pipeline_cogvideox.CogVideoXPipeline._get_t5_prompt_embeds
     def _get_t5_prompt_embeds(
         self,

@@ -6,11 +6,11 @@ import time
 from datetime import datetime, timedelta
 
 import gradio as gr
-import spaces
+# import spaces
 import torch
 from huggingface_hub import hf_hub_download, snapshot_download
-from models.consisid_utils import prepare_face_models, process_face_embeddings_infer
-from models.pipeline_consisid import ConsisIDPipeline
+from diffusers import ConsisIDPipeline
+from diffusers.pipelines.consisid.consisid_utils import prepare_face_models, process_face_embeddings_infer
 from moviepy import VideoFileClip
 from util.rife_model import load_rife_model, rife_inference_with_latents
 from util.utils import load_sd_upscale, save_video, upscale_batch_and_concatenate
@@ -64,7 +64,7 @@ os.makedirs("./gradio_tmp", exist_ok=True)
 upscale_model = load_sd_upscale(f"{model_path}/model_real_esran/RealESRGAN_x4.pth", device)
 frame_interpolation_model = load_rife_model(f"{model_path}/model_rife")
 
-@spaces.GPU(duration=180)
+# @spaces.GPU(duration=180)
 def generate(
     prompt: str,
     image_input: str,
