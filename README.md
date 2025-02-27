@@ -1,7 +1,7 @@
 <div align=center>
 <img src="https://github.com/PKU-YuanGroup/ConsisID/blob/main/asserts/ConsisID_logo.png?raw=true" width="150px">
 </div>
-<h2 align="center"> <a href="https://arxiv.org/abs/2411.17440">Identity-Preserving Text-to-Video Generation by Frequency Decomposition</a></h2>
+<h2 align="center"> <a href="https://arxiv.org/abs/2411.17440">[CVPR 2025] Identity-Preserving Text-to-Video Generation by Frequency Decomposition</a></h2>
 
 <h5 align="center"> If you like our project, please give us a star ⭐ on GitHub for the latest update.  </h2>
 
