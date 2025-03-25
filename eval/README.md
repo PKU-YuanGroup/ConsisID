@@ -38,7 +38,7 @@ pip install natsort
 python eval_all_in_once.py
 ```
 
-We would like to thank [@z-jiaming](https://github.com/z-jiaming) for his work on this [eval_all-in-once.py](https://github.com/PKU-YuanGroup/ConsisID/tree/main/eval/eval_all-in-once.py).
+We would like to thank [@z-jiaming](https://github.com/z-jiaming) for his work on this [eval_all-in-once.py](https://github.com/PKU-YuanGroup/ConsisID/blob/main/eval/eval_all_in_once.py).
 
 ## 🔒 Limitation
 
