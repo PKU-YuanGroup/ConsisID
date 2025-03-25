@@ -32,12 +32,13 @@ def compute_clip_score(video_path, model, processor, prompt, device, num_frames=
     return average_score
 
 
-def main():
-    device = "cuda"
-    model_path = "../ckpts/data_process/clip-vit-base-patch32"
-    prompt = "your prompt"
-    video_file_path = "path/your.mp4"
-    results_file_path = "facesim_fid_score.txt"
+def get_clipscore(
+    device = "cuda",
+    model_path = "../ckpts/data_process/clip-vit-base-patch32",
+    prompt = "your prompt",
+    video_file_path = "path/your.mp4",
+    results_file_path = "clipscore.txt",
+):
 
     if not os.path.exists(model_path):
         print("Model not found, downloading from Hugging Face...")
@@ -57,7 +58,8 @@ def main():
 
     # Print results
     print(f"clip score: {clip_score}")
+    return clip_score
 
 
 if __name__ == "__main__":
-    main()
+    get_clipscore()

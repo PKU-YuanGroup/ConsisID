@@ -22,18 +22,20 @@ Once ready, the weights will be organized in this format:
 
 ## 🗝️ Usage
 
-### Step 0 - Get FaceSim-Score and FID-Score
+### Way 1 - Step by step
+
+```
+# Get FaceSim-Score and FID-Score
+python get_facesim_fid.py
+# Get CLIPScore
+python get_clipscore.py
+```
+
+### Way 2 - All in once
 
 ```
 # change the video_path and image_path first
-python 0_get_facesim_fid.py
-```
-
-### Step 1 - Get CLIPScore
-
-```
-# change the video_path and image_path first
-python 1_get_clipscore.py
+python eval_all_in_once.py
 ```
 
 ## 🔒 Limitation
