@@ -8,8 +8,8 @@ import pandas as pd
 from natsort import natsorted
 import statistics
 from infer import generate_video
-from eval.get_facesim_fid import get_facesim_fid
-from eval.get_clipscore import get_clipscore
+from get_facesim_fid import get_facesim_fid
+from get_clipscore import get_clipscore
 
 
 def main(args):
