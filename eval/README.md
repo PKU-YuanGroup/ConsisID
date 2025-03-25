@@ -34,9 +34,11 @@ python get_clipscore.py
 ### Way 2 - All in once
 
 ```
-# change the video_path and image_path first
+pip install natsort
 python eval_all_in_once.py
 ```
+
+We would like to thank [@z-jiaming](https://github.com/z-jiaming) for his work on this [eval_all-in-once.py](https://github.com/PKU-YuanGroup/ConsisID/tree/main/eval/eval_all-in-once.py).
 
 ## 🔒 Limitation
 

@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append("../")
+
 import argparse
 import os
 
@@ -110,9 +114,7 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Eval your custom model."
-    )
+    parser = argparse.ArgumentParser(description="Eval your custom model.")
 
     # ckpt arguments
     parser.add_argument(
