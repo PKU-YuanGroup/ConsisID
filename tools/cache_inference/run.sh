@@ -1,4 +1,4 @@
-python teacache_inference_consisid.py \
+python tools/cache_inference/teacache_inference_consisid.py \
     --rel_l1_thresh 0.1 \
     --ckpts_path BestWishYsh/ConsisID-preview \
     --image "https://github.com/PKU-YuanGroup/ConsisID/blob/main/asserts/example_images/2.png?raw=true" \

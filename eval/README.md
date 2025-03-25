@@ -26,14 +26,14 @@ Once ready, the weights will be organized in this format:
 
 ```
 # change the video_path and image_path first
-python 0_get_facesim_fid.py
+python get_facesim_fid.py
 ```
 
 ### Step 1 - Get CLIPScore
 
 ```
 # change the video_path and image_path first
-python 1_get_clipscore.py
+python get_clipscore.py
 ```
 
 ## 🔒 Limitation
