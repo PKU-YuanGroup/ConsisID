@@ -26,7 +26,7 @@ PARALLEL_ARGS="--ulysses_degree 2 --ring_degree 3"
 # ENABLE_TILING="--enable_tiling"
 # COMPILE_FLAG="--use_torch_compile"
 
-torchrun --master_port=1234 --nproc_per_node=$N_GPUS ./examples/$SCRIPT \
+torchrun --master_port=1234 --nproc_per_node=$N_GPUS tools/parallel_inference/$SCRIPT \
 --model $MODEL_ID \
 $PARALLEL_ARGS \
 $TASK_ARGS \

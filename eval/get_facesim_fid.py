@@ -187,12 +187,13 @@ def process_video(video_path, face_arc_model, face_cur_model, fid_model, arcface
     return avg_cur_score, avg_arc_score, avg_fid_score
 
 
-def main():
-    device = "cuda"
-    model_path = "../ckpts"
-    video_path = "path/your.mp4"
-    image_path = "path/your.png"
-    results_file_path = "facesim_fid_score.txt"
+def get_facesim_fid(
+    device = "cuda",
+    model_path = "../ckpts",
+    video_path = "path/your.mp4",
+    image_path = "path/your.png",
+    results_file_path = "facesim_fid_score.txt",
+):
 
     if not os.path.exists(model_path):
         print("Model not found, downloading from Hugging Face...")
@@ -248,6 +249,8 @@ def main():
     print(f"arc score: {arc_score}")
     print(f"fid score: {fid_score}")
 
+    return cur_score, arc_score, fid_score
+
 
 if __name__ == "__main__":
-    main()
+    get_facesim_fid()

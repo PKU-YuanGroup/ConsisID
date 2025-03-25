@@ -19,9 +19,7 @@ Follow [ConsisID](https://github.com/PKU-YuanGroup/ConsisID) to clone the repo a
 For single-gpu inference, you can use the following command:
 
 ```bash
-cd TeaCache4ConsisID
-
-python3 teacache_sample_video.py \
+python3 tools/cache_inference/teacache_inference_consisid.py \
     --rel_l1_thresh 0.1 \
     --ckpts_path BestWishYsh/ConsisID-preview \
     --image "https://github.com/PKU-YuanGroup/ConsisID/blob/main/asserts/example_images/2.png?raw=true" \
