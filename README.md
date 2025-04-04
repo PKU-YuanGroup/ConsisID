@@ -1,7 +1,7 @@
 <div align=center>
 <img src="https://github.com/PKU-YuanGroup/ConsisID/blob/main/asserts/ConsisID_logo.png?raw=true" width="150px">
 </div>
-<h2 align="center"> <a href="https://arxiv.org/abs/2411.17440">[CVPR 2025] Identity-Preserving Text-to-Video Generation by Frequency Decomposition</a></h2>
+<h2 align="center"> <a href="https://arxiv.org/abs/2411.17440">[CVPR 2025 Highlight] Identity-Preserving Text-to-Video Generation by Frequency Decomposition</a></h2>
 
 <h5 align="center"> If you like our project, please give us a star ⭐ on GitHub for the latest update.  </h2>
 
@@ -49,6 +49,7 @@ This repository is the official implementation of ConsisID, a tuning-free DiT-ba
 ## 📣 News
 
 * ⏳⏳⏳ Release the full code & datasets & weights.
+* `[2024.04.04]`  🔥 Break news! ConsisID has been recommended as **CVPR Highlight**.
 * `[2024.03.27]`  🔥 We have updated our technical report. Please click [here](https://arxiv.org/abs/2411.17440v3) to view it. 
 * `[2024.02.27]`  🔥 ConsisID has been accepted by **CVPR 2025**, and we will update arXiv with more details soon, keep tuned!
 * `[2024.02.16]`  🔥 We have adapted the code for CogVideoX1.5, and you can use our code not only for training ConsisID but also for the CogVideoX-series.
