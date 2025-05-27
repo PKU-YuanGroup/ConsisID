@@ -36,6 +36,10 @@ This repository is the official implementation of ConsisID, a tuning-free DiT-ba
 > Bin Lin, Yunyang Ge and Xinhua Cheng etc. <br>
 [![github](https://img.shields.io/badge/-Github-black?logo=github)](https://github.com/PKU-YuanGroup/Open-Sora-Plan)  [![github](https://img.shields.io/github/stars/PKU-YuanGroup/Open-Sora-Plan.svg?style=social)](https://github.com/PKU-YuanGroup/Open-Sora-Plan) [![arXiv](https://img.shields.io/badge/Arxiv-2412.00131-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2412.00131) <br>
 >
+> [**OpenS2V-Nexus: A Detailed Benchmark and Million-Scale Dataset for Subject-to-Video Generation**](https://arxiv.org/abs/2505.20292) <br>
+> Shenghai Yuan, Xianyi He and Yufan Deng etc. <br>
+> [![github](https://img.shields.io/badge/-Github-black?logo=github)](https://github.com/PKU-YuanGroup/OpenS2V-Nexus)  [![github](https://img.shields.io/github/stars/PKU-YuanGroup/OpenS2V-Nexus.svg?style=social)](https://github.com/PKU-YuanGroup/OpenS2V-Nexus) [![arXiv](https://img.shields.io/badge/Arxiv-2505.20292-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2505.20292) <br>
+>
 > [**MagicTime: Time-lapse Video Generation Models as Metamorphic Simulators**](https://arxiv.org/abs/2404.05014) <br>
 > Shenghai Yuan, Jinfa Huang and Yujun Shi etc. <br>
 > [![github](https://img.shields.io/badge/-Github-black?logo=github)](https://github.com/PKU-YuanGroup/MagicTime)  [![github](https://img.shields.io/github/stars/PKU-YuanGroup/MagicTime.svg?style=social)](https://github.com/PKU-YuanGroup/MagicTime) [![arXiv](https://img.shields.io/badge/Arxiv-2404.05014-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2404.05014) <br>
@@ -49,6 +53,7 @@ This repository is the official implementation of ConsisID, a tuning-free DiT-ba
 ## 📣 News
 
 * ⏳⏳⏳ Release the full code & datasets & weights.
+* `[2025.05.27]`  🔥 Introducing [**​​OpenS2V-Nexus**​​](https://github.com/PKU-YuanGroup/OpenS2V-Nexus), which consists of: (i) ​​[**OpenS2V-Eval**​​](https://huggingface.co/spaces/BestWishYsh/OpenS2V-Eval), a fine-grained benchmark, and (ii) [​​**OpenS2V-5M​​**](https://huggingface.co/datasets/BestWishYsh/OpenS2V-5M), a million-scale dataset. Welcome to try it!
 * `[2025.04.04]`  🔥 Breaking news! ConsisID has been recommended as **CVPR Highlight**.
 * `[2025.03.27]`  🔥 We have updated our technical report. Please click [here](https://arxiv.org/abs/2411.17440v3) to view it. 
 * `[2025.02.27]`  🔥 ConsisID has been accepted by CVPR 2025, and we will update arXiv with more details soon. Stay tuned!
