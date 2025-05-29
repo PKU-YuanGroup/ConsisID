@@ -83,7 +83,7 @@ or you can click <a href="https://github.com/SHYuanBest/shyuanbest_media/raw/ref
 ### Diffusers API
 
 ```bash
-!pip install git+https://github.com/huggingface/diffusers.git
+!pip install diffusers==0.33.1
 import torch
 from diffusers import ConsisIDPipeline
 from diffusers.pipelines.consisid.consisid_utils import prepare_face_models, process_face_embeddings_infer

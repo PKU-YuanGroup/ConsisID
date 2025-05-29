@@ -6,7 +6,7 @@ onnx==1.17.0
 onnxruntime-gpu==1.19.2
 deepspeed==0.15.2
 accelerate==1.1.1
-git+https://github.com/huggingface/diffusers.git
+diffusers==0.33.1
 transformers==4.46.3
 tokenizers==0.20.1
 peft==0.12.0
