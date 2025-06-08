@@ -345,11 +345,12 @@ We release the data used for evaluation in [ConsisID](https://huggingface.co/pap
 If you find our paper and code useful in your research, please consider giving a star :star: and citation :pencil:.
 
 ```BibTeX
-@article{yuan2024identity,
-  title={Identity-Preserving Text-to-Video Generation by Frequency Decomposition},
-  author={Yuan, Shenghai and Huang, Jinfa and He, Xianyi and Ge, Yunyuan and Shi, Yujun and Chen, Liuhan and Luo, Jiebo and Yuan, Li},
-  journal={arXiv preprint arXiv:2411.17440},
-  year={2024}
+@inproceedings{yuan2025identity,
+  title={Identity-preserving text-to-video generation by frequency decomposition},
+  author={Yuan, Shenghai and Huang, Jinfa and He, Xianyi and Ge, Yunyang and Shi, Yujun and Chen, Liuhan and Luo, Jiebo and Yuan, Li},
+  booktitle={Proceedings of the Computer Vision and Pattern Recognition Conference},
+  pages={12978--12988},
+  year={2025}
 }
 ```
 
