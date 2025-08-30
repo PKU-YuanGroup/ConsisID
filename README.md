@@ -53,6 +53,7 @@ This repository is the official implementation of ConsisID, a tuning-free DiT-ba
 ## 📣 News
 
 * ⏳⏳⏳ Release the full code & datasets & weights.
+* `[2025.08.30]`  🚀 Thanks for the excellent work [DanceGRPO](https://github.com/XueZeyue/DanceGRPO) on transferring ConsisID for I2V RL training, please refer to [here](https://github.com/XueZeyue/DanceGRPO?tab=readme-ov-file#training) for more details.
 * `[2025.05.27]`  🔥 Introducing [**​​OpenS2V-Nexus**​​](https://github.com/PKU-YuanGroup/OpenS2V-Nexus), which consists of: (i) ​​[**OpenS2V-Eval**​​](https://huggingface.co/spaces/BestWishYsh/OpenS2V-Eval), a fine-grained benchmark, and (ii) [​​**OpenS2V-5M​​**](https://huggingface.co/datasets/BestWishYsh/OpenS2V-5M), a million-scale dataset. Welcome to try it!
 * `[2025.04.04]`  🔥 Breaking news! ConsisID has been recommended as **CVPR Highlight**.
 * `[2025.03.27]`  🔥 We have updated our technical report. Please click [here](https://arxiv.org/abs/2411.17440v3) to view it. 
