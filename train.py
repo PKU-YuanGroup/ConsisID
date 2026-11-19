@@ -129,7 +129,7 @@ def log_validation(
     pipe = pipe.to(accelerator.device)
 
     # Initialize the random generator with a specified seed, if provided
-    generator = torch.Generator(device=accelerator.device).manual_seed(args.seed) if args.seed else None
+    generator = torch.Generator(device=accelerator.device).manual_seed(args.seed) if args.seed is not None else None
 
     # Perform video generation without tracking gradients (inference mode)
     videos = []

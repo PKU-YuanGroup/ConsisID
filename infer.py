@@ -100,7 +100,7 @@ def generate_video(
 
 
     # 5. Generate Identity-Preserving Video
-    generator = torch.Generator(device).manual_seed(seed) if seed else None
+    generator = torch.Generator(device).manual_seed(seed) if seed is not None else None
     video_pt = pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
